@@ -29,12 +29,16 @@ async function run() {
     const toysCollection = client.db('toysDB').collection('toys')
 
     app.get('/toys', async(req, res) =>{
-        const result = await toysCollection.find().toArray()
+        const result = await toysCollection.find().limit(20).toArray()
         res.send(result)
     })
 
 
-
+    app.get('/searchToyByName/:name', async(req, res) =>{
+      const name = req.params.name
+     const result = await toysCollection.find({ toyName: { $regex: name, $options: 'i' } }).toArray()
+     res.send(result)
+    })
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");

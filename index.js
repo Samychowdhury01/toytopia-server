@@ -47,12 +47,12 @@ async function run() {
     });
 
     // GET data based on email
-    app.get('/my-Toys/', async(req, res) =>{
-      const email = req.query.email
-      const query = {email : email}
-      const result = await toysCollection.find(query).toArray()
-      res.send(result)
-    })
+    app.get("/my-Toys/", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const result = await toysCollection.find(query).toArray();
+      res.send(result);
+    });
 
     // POST a toy data
     app.post("/toys", async (req, res) => {
@@ -63,27 +63,31 @@ async function run() {
     });
 
     //API for UPDATE a toy
-    app.put('/toys/:id', async(req, res) =>{
-      const id = req.params.id
-      const updatedToyData = req.body
-      const filter = {_id : new ObjectId(id)}
+    app.put("/toys/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedToyData = req.body;
+      const filter = { _id: new ObjectId(id) };
       const options = { upsert: true };
       const updatedData = {
-        $set:{
-          ...updatedToyData
-        }        
-      }
-      const result = await toysCollection.updateOne(filter, updatedData, options)
-      res.send(result)
-    })
+        $set: {
+          ...updatedToyData,
+        },
+      };
+      const result = await toysCollection.updateOne(
+        filter,
+        updatedData,
+        options
+      );
+      res.send(result);
+    });
 
-    // DELETE a toy 
-    app.delete('/toys/:id', async(req, res) =>{
-      const id = req.params.id
-      const query = {_id : new ObjectId(id)}
-      const result = await toysCollection.deleteOne(query)
-      res.send(result)
-    })
+    // DELETE a toy
+    app.delete("/toys/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await toysCollection.deleteOne(query);
+      res.send(result);
+    });
 
     // search by name
     app.get("/searchToyByName/:name", async (req, res) => {
@@ -93,6 +97,32 @@ async function run() {
         .toArray();
       res.send(result);
     });
+
+    // sort data by price
+    app.get("/sortedByPrice", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const sortType = req.query.sort
+      if(sortType === 'ascending'){
+        const result = await toysCollection
+        .find(query)
+        .sort({ price: -1 })
+        .toArray();
+        return res.send(result);
+       
+      }
+      else{
+        const result = await toysCollection
+        .find(query)
+        .sort({ price: 1 })
+        .toArray();
+        return res.send(result);
+      }
+  
+      
+      
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(

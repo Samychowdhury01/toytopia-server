@@ -28,11 +28,13 @@ async function run() {
     await client.connect();
     const toysCollection = client.db('toysDB').collection('toys')
 
+    // GET All Toys from server
     app.get('/toys', async(req, res) =>{
-        const result = await toysCollection.find().limit(20).toArray()
+        const result = await toysCollection.find().sort({createdAt : -1}).limit(20).toArray()
         res.send(result)
     })
 
+    // get a specific toy by ID
     app.get('/toys/:id', async(req, res) =>{
       const id = req.params.id
       const query = {_id : new ObjectId(id)}
@@ -41,7 +43,16 @@ async function run() {
 
     })
 
+    // POST a toy data
+    app.post('/addToy', async(req, res) =>{
+      const toy =  req.body
+      toy.createdAt = new Date()
+      const result = await toysCollection.insertOne(toy)
+      res.send(result)
+    })
 
+
+    // search by name 
     app.get('/searchToyByName/:name', async(req, res) =>{
       const name = req.params.name
      const result = await toysCollection.find({ toyName: { $regex: name, $options: 'i' } }).toArray()
